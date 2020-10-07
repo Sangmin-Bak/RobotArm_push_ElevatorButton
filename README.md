@@ -16,21 +16,21 @@ Install ocr-rcnn-v2
 https://github.com/zhudelong/ocr-rcnn-v2
 
 Install OpenManipulator
-
 https://emanual.robotis.com/docs/en/platform/openmanipulator_x/ros_setup/#ros-setup
 
+
 cd ~/catkin_ws/src
-git clone (project_name)
+git clone https://github.com/sm315/RobotArm_push_ElevatorButton.git
 cd ~/catkin_ws && catkin_make
 
-cd ~/(project_name)/open_manipulator_libs/src
+cd ~/catkin_ws/src/RobotArm_push_ElevatorButton/open_manipulator_libs/src
 cp open_manipulator.cpp ~/catkin_ws/src/open_manipulator_libs/src/
 
-cd ~/(project_name)/robotis_manipulator
+cd ~/catkin_ws/src/RobotArm_push_ElevatorButton/robotis_manipulator
 cp -r include/ ~/catkin_ws/src/robotis_manipulator
 cp -r src/ ~/catkin_ws/src/robotis_manipulator
 
-cd ~/(project_name)/button_trakcer_3d/capy_files
+roscd button_trakcer_3d/capy_files
 cp recognniton_service.py ~/catkin_ws/src/ocr-rcnn-v2/src/button_recognition/scripts
 
 cd ~/catkin_ws && catkin_make
@@ -46,7 +46,7 @@ roslaunch button_tracker_3d button_tracker.launch
 roslaunch t-bot_manipulator_controller push.launch
 ```
 
-## 참고 링크
+## Links referenced
 1.  button detection : https://github.com/zhudelong/ocr-rcnn-v2
 2.  3D position : https://github.com/IntelligentRoboticsLabs/gb_visual_detection_3d
 3.  Robot Arm Control : https://github.com/minwoominwoominwoo7/open_manipulator_find_object_2d
