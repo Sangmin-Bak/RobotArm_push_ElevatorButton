@@ -1,0 +1,25 @@
+{
+    "configurations": [
+        {
+            "browse": {
+                "databaseFilename": "",
+                "limitSymbolsToIncludedHeaders": true
+            },
+            "includePath": [
+                "/home/sm-park/catkin_ws/devel/include/**",
+                "/opt/ros/melodic/include/**",
+                "/home/sm-park/catkin_ws/src/darknet_ros/darknet_ros/include/**",
+                "/home/sm-park/catkin_ws/src/jsk_common/jsk_topic_tools/include/**",
+                "/home/sm-park/catkin_ws/src/realsense/realsense2_camera/include/**",
+                "/home/sm-park/catkin_ws/src/universal_robot/ur_kinematics/include/**",
+                "/usr/include/**"
+            ],
+            "name": "ROS",
+            "intelliSenseMode": "gcc-x64",
+            "compilerPath": "/usr/bin/gcc",
+            "cStandard": "gnu11",
+            "cppStandard": "c++17"
+        }
+    ],
+    "version": 4
+}
