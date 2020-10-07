@@ -1,0 +1,49 @@
+{
+    "configurations": [
+        {
+            "browse": {
+                "databaseFilename": "",
+                "limitSymbolsToIncludedHeaders": true
+            },
+            "includePath": [
+                "/root/catkin_ws/devel/include",
+                "/opt/ros/kinetic/include",
+                "/root/catkin_ws/src/button_tracker_3d/include",
+                "/root/catkin_ws/src/cougarbot/include",
+                "/root/catkin_ws/src/cv_bridge_tutorial/include",
+                "/root/catkin_ws/src/darknet_ros/darknet_ros/include",
+                "/root/catkin_ws/src/darknet_ros_3d/include",
+                "/root/catkin_ws/src/DynamixelSDK/ros/include",
+                "/root/catkin_ws/src/dynamixel-workbench/dynamixel_workbench_controllers/include",
+                "/root/catkin_ws/src/dynamixel-workbench/dynamixel_workbench_operators/include",
+                "/root/catkin_ws/src/dynamixel-workbench/dynamixel_workbench_toolbox/include",
+                "/root/catkin_ws/src/jsk_common/jsk_topic_tools/include",
+                "/root/catkin_ws/src/learning_tf/include",
+                "/root/catkin_ws/src/open_manipulator/open_manipulator_control_gui/include",
+                "/root/catkin_ws/src/open_manipulator_controls/open_manipulator_controllers/include",
+                "/root/catkin_ws/src/open_manipulator/open_manipulator_controller/include",
+                "/root/catkin_ws/src/open_manipulator_controls/open_manipulator_hw/include",
+                "/root/catkin_ws/src/open_manipulator/open_manipulator_libs/include",
+                "/root/catkin_ws/src/open_manipulator_perceptions/open_manipulator_pick_and_place/include",
+                "/root/catkin_ws/src/open_manipulator/open_manipulator_teleop/include",
+                "/root/catkin_ws/src/realsense/realsense2_camera/include",
+                "/root/catkin_ws/src/robotis_manipulator/include",
+                "/root/catkin_ws/src/simple_robot_arm_with_ros/ros/src/rosserial_server/include",
+                "/root/catkin_ws/src/turtlebot3_simulations/turtlebot3_fake/include",
+                "/root/catkin_ws/src/turtlebot3_simulations/turtlebot3_gazebo/include",
+                "/root/catkin_ws/src/turtlebot3_manipulation/turtlebot3_manipulation_bringup/include",
+                "/root/catkin_ws/src/turtlebot3_manipulation/turtlebot3_manipulation_gui/include",
+                "/root/catkin_ws/src/turtlebot3/turtlebot3_slam/include",
+                "/root/catkin_ws/src/universal_robot/ur_kinematics/include",
+                "/usr/include",
+                "/usr/include/pcl-1.7"
+            ],
+            "name": "Linux",
+            "intelliSenseMode": "gcc-x64",
+            "compilerPath": "/usr/bin/gcc",
+            "cStandard": "gnu11",
+            "cppStandard": "c++17"
+        }
+    ],
+    "version": 4
+}

@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>t-bot_manipulator_controller</name>
+  <version>0.0.0</version>
+  <description>The t-bot_manipulator_controller package</description>
+  <maintainer email="samet5249@gmail.com">root</maintainer>
+  <license>Apache 2.0</license>
+  <url type="website">http://wiki.ros.org/open_manipulator_description</url>
+  <buildtool_depend>catkin</buildtool_depend>
+  <depend>rospy</depend>  
+  <depend>std_msgs</depend>
+  <depend>sensor_msgs</depend>
+  <depend>open_manipulator_msgs</depend> 
+  <depend>tf</depend>
+  <depend>gazebo_ros</depend>
+  <depend>gazebo_ros_control</depend>
+  <depend>controller_manager</depend>  
+  <depend>xacro</depend>
+  <depend>urdf</depend>     
+  <depend>find_object_2d</depend>  
+  <export>
+    <gazebo_ros gazebo_media_path="${prefix}"/>
+    <gazebo_ros gazebo_model_path="${prefix}/models"/>
+  </export>  
+</package>
