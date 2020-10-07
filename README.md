@@ -1,4 +1,5 @@
 # Robot Arm push the Elevator Button
+This project recognizes elevator buttons as cameras and presses them with robot arms.
 
 ## Requirements
 1. Ubuntu16.04
