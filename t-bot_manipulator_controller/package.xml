@@ -7,6 +7,7 @@
   <license>Apache 2.0</license>
   <url type="website">http://wiki.ros.org/open_manipulator_description</url>
   <buildtool_depend>catkin</buildtool_depend>
+  <!-- <depend>roscpp</depend>
   <depend>rospy</depend>  
   <depend>std_msgs</depend>
   <depend>sensor_msgs</depend>
@@ -17,7 +18,47 @@
   <depend>controller_manager</depend>  
   <depend>xacro</depend>
   <depend>urdf</depend>     
-  <depend>find_object_2d</depend>  
+  <depend>find_object_2d</depend>   -->
+  <build_depend>roscpp</build_depend>
+  <build_depend>rospy</build_depend>
+  <build_depend>std_msgs</build_depend>
+  <build_depend>sensor_msgs</build_depend>
+  <build_depend>open_manipulator_msgs</build_depend>
+  <build_depend>tf</build_depend>
+  <build_depend>gazebo_ros</build_depend>
+  <build_depend>gazebo_ros_control</build_depend>
+  <build_depend>controller_manager</build_depend>
+  <build_depend>xacro</build_depend>
+  <build_depend>urdf</build_depend>
+  <build_depend>boost</build_depend>
+  <build_depend>message_generation</build_depend>
+
+  <build_export_depend>roscpp</build_export_depend>
+  <build_export_depend>rospy</build_export_depend>
+  <build_export_depend>std_msgs</build_export_depend>
+  <build_export_depend>sensor_msgs</build_export_depend>
+  <build_export_depend>open_manipulator_msgs</build_export_depend>
+  <build_export_depend>tf</build_export_depend>
+  <build_export_depend>gazebo_ros</build_export_depend>
+  <build_export_depend>gazebo_ros_control</build_export_depend>
+  <build_export_depend>controller_manager</build_export_depend>
+  <build_export_depend>xacro</build_export_depend>
+  <build_export_depend>urdf</build_export_depend>
+  <build_export_depend>boost</build_export_depend>
+
+  <exec_depend>roscpp</exec_depend>
+  <exec_depend>rospy</exec_depend>
+  <exec_depend>std_msgs</exec_depend>
+  <exec_depend>sensor_msgs</exec_depend>
+  <exec_depend>open_manipulator_msgs</exec_depend>
+  <exec_depend>tf</exec_depend>
+  <exec_depend>gazebo_ros</exec_depend>
+  <exec_depend>gazebo_ros_control</exec_depend>
+  <exec_depend>controller_manager</exec_depend>
+  <exec_depend>xacro</exec_depend>
+  <exec_depend>urdf</exec_depend>
+  <exec_depend>boost</exec_depend>
+  <exec_depend>message_runtime</exec_depend>
   <export>
     <gazebo_ros gazebo_media_path="${prefix}"/>
     <gazebo_ros gazebo_model_path="${prefix}/models"/>
