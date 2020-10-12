@@ -24,7 +24,7 @@ find_package(catkin REQUIRED
 )
 
 find_package(gazebo REQUIRED)
-find_package(Boost REQUIRED)
+# find_package(Boost REQUIRED)
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
 
@@ -84,6 +84,7 @@ generate_messages(
   DEPENDENCIES
   std_msgs  # Or other packages containing msgs\
   geometry_msgs
+  open_manipulator_msgs
 )
 
 catkin_package(
@@ -101,7 +102,7 @@ catkin_package(
     xacro
     urdf    
     message_runtime
-  DEPENDS gazebo Boost
+  DEPENDS gazebo 
 )
 
 ###########
@@ -121,7 +122,7 @@ add_library(${PROJECT_NAME}
   src/${PROJECT_NAME}/Controller.cpp
 )
 
-add_executable(push src/push.cpp)
+add_executable(push src/push.cpp src/${PROJECT_NAME}/Controller.cpp)
 add_dependencies(push ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(push ${catkin_LIBRARIES} ${Boost_LIBRARIES})
 
