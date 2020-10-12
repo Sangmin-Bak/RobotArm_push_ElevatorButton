@@ -319,9 +319,9 @@ bool PushButton::moveToButton()
         ROS_INFO_STREAM(pushButtonPose.pose);
 
         srv.request.kinematics_pose.pose.position = forwardButtonPosition(srv.request.kinematics_pose.pose.position, 0.05);
-        // srv.request.kinematics_pose.pose.position.x += 0.035;
-        // srv.request.kinematics_pose.pose.position.y -= 0.025;
-        srv.request.kinematics_pose.pose.position.z += 0.025;
+        srv.request.kinematics_pose.pose.position.x += 0.01;
+        srv.request.kinematics_pose.pose.position.y -= 0.015;
+        // srv.request.kinematics_pose.pose.position.z += 0.025;
 
         float moveDistance = sqrt(pow((srv.request.kinematics_pose.pose.position.x - currentToolPose.position.x), 2)
                                 +  pow((srv.request.kinematics_pose.pose.position.y - currentToolPose.position.y), 2)
@@ -374,40 +374,22 @@ void PushButton::update()
         if (is_triggered == true)
         {
             setInitPose();
-            std::cout << "============ Press `Enter` to begin the tutorial by setting up the moveit_commander (press ctrl-d to exit) ..." << std::endl;
-            c = std::cin.get();
-            if (c != '\n')
-            {   
-                is_shutdown = true;
-                return;
-            }
+            // std::cout << "============ Press `Enter` to begin the tutorial by setting up the moveit_commander (press ctrl-d to exit) ..." << std::endl;
+            // c = std::cin.get();
+            // if (c != '\n')
+            // {   
+            //     is_shutdown = true;
+            //     return;
+            // }
+            ros::Duration(2.0).sleep();
+
             // if (!push_s     tart) break;
             // ros::Duration(1.0).sleep();
             moveToButton();
+            ros::Duration(5.0).sleep();
         }
-        ros::Duration(5.0).sleep();
         ros::spinOnce();
         loop_rate.sleep();
     }
-    // ros::spinOnce();
-    // if (is_triggered == true)
-    // {
-    //     setInitPose();
-    //     std::cout << "============ Press `Enter` to begin the tutorial by setting up the moveit_commander (press ctrl-d to exit) ..." << std::endl;
-    //     c = std::cin.get();
-    //     if (c != '\n')
-    //     {   
-    //         is_shutdown = true;
-    //         return;
-    //     }
-    //     // ros::Duration(2.0).sleep();
-    //     // if (!push_start)    
-    //     //     return;
-    //     if (moveToButton() == false)
-    //         return;
-
-    //     ros::Duration(2.0).sleep();
-
-    // }
 }
 }
