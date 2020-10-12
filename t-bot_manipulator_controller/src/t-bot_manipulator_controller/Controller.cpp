@@ -18,7 +18,6 @@
 
 #include <math.h>
 
-// using namespace push_button;
 namespace push_button
 {
 PushButton::PushButton()
@@ -38,9 +37,6 @@ PushButton::PushButton()
     open_manipulator_kinematics_pose_sub = nh_.subscribe("/gripper/kinematics_pose", 10, &PushButton::kinematicsPoseCallback, this);
     open_manipulator_states_sub = nh_.subscribe("/states", 10, &PushButton::statesCallback, this);
     marker_point = nh_.subscribe("/button_tracker_3d/markers", 10, &PushButton::markerCallback, this);
-
-    // ros::spinOnce();
-    update();
 }
 
 PushButton::~PushButton()
@@ -49,11 +45,8 @@ PushButton::~PushButton()
         std::cout << "program shutdown..." << std::endl;
 }
 
-
-
 void PushButton::kinematicsPoseCallback(const open_manipulator_msgs::KinematicsPose::ConstPtr& msg)
 {
-    // std::cout << "kinematicsPoseCallback" << std::endl;
     std::vector<double> temp_position;
 
     // currentToolPose = msg->pose;
@@ -79,7 +72,6 @@ void PushButton::markerCallback(const visualization_msgs::MarkerArray::ConstPtr&
     // pushButtonPose.header = msg->markers[0].header;
     // pushButtonPose.pose = msg->markers[0].pose;
 
-    // if (msg->markers[0].id == 0)
     if (!msg->markers.empty())
     {
         push_start = true;
@@ -94,13 +86,10 @@ void PushButton::markerCallback(const visualization_msgs::MarkerArray::ConstPtr&
 
 void PushButton::jointStatesCallback(const sensor_msgs::JointState::ConstPtr& msg)
 {
-    // std::cout << "jointStatesCallback" << std::endl;
     is_triggered = true;
-    // std::cout << "is_trigger: " << is_triggered << std::endl;
 
     for (int i = 0; i < msg->position.size(); i++)
     {
-        // jointState[i] = msg->position[i];
         jointState.push_back(msg->position[i]);
     }
 }
@@ -280,7 +269,7 @@ geometry_msgs::Point PushButton::forwardButtonPosition(geometry_msgs::Point butt
     }
 
     double radian = atan(button_position.y / button_position.x);
-    double degree = radian * (180.0 / 3.1415926);
+    double degree = radian * (180.0 / 3.14);
     double dist = forward_distance;
     double distX = cos(radian) * dist;
     double distY = sin(radian) * dist;
@@ -298,20 +287,15 @@ geometry_msgs::Point PushButton::forwardButtonPosition(geometry_msgs::Point butt
 
 bool PushButton::moveToButton()
 {
-    ROS_WARN("move to object");
-    
     bool resp = false;
-    // std::string end_effector_name = "gripper";
-    // std::string planning_group = "arm";
-    // open_manipulator_msgs::KinematicsPose kinematics_pose;
 
-    open_manipulator_msgs::SetKinematicsPose srv;
-    srv.request.end_effector_name = "gripper";
-    srv.request.planning_group = "arm";
+    if (pushButtonPose.pose.position.x > 0)
+    {   
+        ROS_WARN("move to button");
 
-    if (pushButtonPose.pose.position.x > 0 && pushButtonPose.pose.position.y > 0 
-        && pushButtonPose.pose.position.z > 0)
-    {
+        open_manipulator_msgs::SetKinematicsPose srv;
+        srv.request.end_effector_name = "gripper";
+        srv.request.planning_group = "arm";
         srv.request.kinematics_pose.pose = pushButtonPose.pose;
         // kinematics_pose.pose = pushButtonPose.pose;
 
@@ -319,17 +303,17 @@ bool PushButton::moveToButton()
         ROS_INFO_STREAM(pushButtonPose.pose);
 
         srv.request.kinematics_pose.pose.position = forwardButtonPosition(srv.request.kinematics_pose.pose.position, 0.05);
-        srv.request.kinematics_pose.pose.position.x += 0.01;
+        // srv.request.kinematics_pose.pose.position.x += 0.01;
         srv.request.kinematics_pose.pose.position.y -= 0.015;
-        // srv.request.kinematics_pose.pose.position.z += 0.025;
+        srv.request.kinematics_pose.pose.position.z += 0.015;
 
-        float moveDistance = sqrt(pow((srv.request.kinematics_pose.pose.position.x - currentToolPose.position.x), 2)
+        double moveDistance = sqrt(pow((srv.request.kinematics_pose.pose.position.x - currentToolPose.position.x), 2)
                                 +  pow((srv.request.kinematics_pose.pose.position.y - currentToolPose.position.y), 2)
                                 +  pow((srv.request.kinematics_pose.pose.position.z - currentToolPose.position.z), 2));
 
         srv.request.path_time = moveDistance * 10.0;
-        float operating_time = srv.request.path_time;
-        float operating_limit_time = operating_time;
+        double operating_time = srv.request.path_time;
+        double operating_limit_time = operating_time;
 
         if (operating_time < 1.0)
         {
@@ -354,42 +338,25 @@ bool PushButton::moveToButton()
             return false;
         }
     }
-    return resp;
+    else
+    {
+        ROS_INFO("Cannot go to the position of the button");
+        return resp;
+    }
 }
 
 void PushButton::update()
 {
-    char c;
-
-    ros::Duration(1.0).sleep();
-    // actuatorTorque(true);
-    // std::cout << "is_trigger: " << is_triggered << std::endl;
-
-    ros::Rate loop_rate(10);
-    actuatorTorque(true);
-    // ros::Duration(1.0).sleep();
-
-    while (ros::ok())
+    if (is_triggered == true)
     {
-        if (is_triggered == true)
+        setInitPose();
+        
+        if (push_start)
         {
-            setInitPose();
-            // std::cout << "============ Press `Enter` to begin the tutorial by setting up the moveit_commander (press ctrl-d to exit) ..." << std::endl;
-            // c = std::cin.get();
-            // if (c != '\n')
-            // {   
-            //     is_shutdown = true;
-            //     return;
-            // }
-            ros::Duration(2.0).sleep();
-
-            // if (!push_s     tart) break;
-            // ros::Duration(1.0).sleep();
             moveToButton();
             ros::Duration(5.0).sleep();
         }
-        ros::spinOnce();
-        loop_rate.sleep();
     }
 }
+
 }

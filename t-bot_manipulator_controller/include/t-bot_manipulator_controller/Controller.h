@@ -29,8 +29,6 @@
 #include <std_msgs/Float64.h>
 #include <std_msgs/String.h>
 #include <visualization_msgs/MarkerArray.h>
-#include <math.h>
-#include <cmath>
 #include <string>
 #include <vector>
 
@@ -48,8 +46,7 @@ namespace push_button
 {
 class PushButton
 {
-    private:
-    // ros::NodeHandle nh_;
+private:
 
     ros::ServiceClient set_joint_position;
     ros::ServiceClient set_kinematics_position;
@@ -70,19 +67,16 @@ class PushButton
     bool push_start;
     bool is_triggered;
     bool is_shutdown;
-    // float jointState[10];
-    // float kinematicsStates[3];
     std::vector<double> jointState;
     std::vector<double> kinematicsStates;
     std::string open_manipulator_moveing_state;
 
-    public:
+public:
+
     PushButton();
 
-    // void init();
     void kinematicsPoseCallback(const open_manipulator_msgs::KinematicsPose::ConstPtr& msg);
     void markerCallback(const visualization_msgs::MarkerArray::ConstPtr& msg);
-    // void kinematicsPoseCallback2(open_manipulator_msgs::KinematicsPose::ConstPtr& msg);
     void jointStatesCallback(const sensor_msgs::JointState::ConstPtr& msg);
     void statesCallback(const open_manipulator_msgs::OpenManipulatorState::ConstPtr& msg);
     bool setInitPose();
@@ -91,11 +85,8 @@ class PushButton
 
     void setJointPositionCallback();
 
-    // geometry_msgs::Point forwardButtonPosition(std::vector<std_msgs::Float64> button_position, float forward_distance);
     geometry_msgs::Point forwardButtonPosition(geometry_msgs::Point button_position, double forward_distance);
-    // open_manipulator_msgs::SetActuatorStateResponse actuatorTorque(bool enable);
     bool actuatorTorque(bool enable);
-    // open_manipulator_msgs::SetKinematicsPoseResponse moveToButton();
     bool moveToButton();
 
     void update();
