@@ -37,7 +37,7 @@ Button3D::Button3D():
   initParams();
 
   button3d_pub_ = nh_.advertise<gb_visual_detection_3d_msgs::BoundingBoxes3d>(output_bbx3d_topic_, 100);
-  markers_pub_ = nh_.advertise<visualization_msgs::MarkerArray>("/button_tracker_3d/markers", 10);
+  markers_pub_ = nh_.advertise<visualization_msgs::MarkerArray>("/button_tracker_3d/markers", 100);
 
   yolo_sub_ = nh_.subscribe(input_bbx_topic_, 1, &Button3D::buttonCb, this);
   pointCloud_sub_ = nh_.subscribe(pointcloud_topic_, 1, &Button3D::pointCloudCb, this);
