@@ -10,6 +10,9 @@ This project recognizes elevator buttons as cameras and presses them with robot 
 
 ## Installation
 ```
+Install pycuda
+pip install pycuda
+
 Install Realsense D435
 https://emanual.robotis.com/docs/en/platform/openmanipulator_x/ros_perceptions/
 
