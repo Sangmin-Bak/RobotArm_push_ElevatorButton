@@ -1,0 +1,6 @@
+button_recognition_topic: /button_recognition/bounding_boxes
+output_bbx3d_topic: /button_tracker_3d/bounding_boxes
+point_cloud_topic: /camera/depth_registered/points
+working_frame: /world
+mininum_detection_thereshold: 0.3
+minimum_probability: 0.3
