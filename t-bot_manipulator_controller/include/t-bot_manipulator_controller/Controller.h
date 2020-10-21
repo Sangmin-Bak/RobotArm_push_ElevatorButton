@@ -64,6 +64,15 @@ private:
     geometry_msgs::Pose currentToolPose;
     open_manipulator_msgs::KinematicsPose kinematics_pose_;
 
+    // enum BTType
+    // {
+    //     OPEN = 1,
+    //     CLOSE = 0,
+    //     UP = 2,
+    //     DOWN = 3
+    // };
+    int select_type;
+
     bool push_start;
     bool is_triggered;
     bool is_shutdown;
@@ -79,6 +88,7 @@ public:
     void markerCallback(const visualization_msgs::MarkerArray::ConstPtr& msg);
     void jointStatesCallback(const sensor_msgs::JointState::ConstPtr& msg);
     void statesCallback(const open_manipulator_msgs::OpenManipulatorState::ConstPtr& msg);
+    void selectButton(int select_type);
     bool setInitPose();
     bool setBackwardPose();
     bool setBackwardPose2();

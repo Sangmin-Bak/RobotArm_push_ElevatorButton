@@ -25,7 +25,8 @@ PushButton::PushButton()
     ros::NodeHandle nh_("");
     push_start = false;
     is_triggered = false;
-    open_manipulator_moveing_state = "STOPPED";
+    open_manipulator_moveing_state = "STOPPED"; 
+    select_type = 0;
     
     set_joint_position = nh_.serviceClient<open_manipulator_msgs::SetJointPosition>("goal_joint_space_path");
     set_kinematics_position = nh_.serviceClient<open_manipulator_msgs::SetKinematicsPose>("goal_task_space_path_position_only");
@@ -344,6 +345,19 @@ bool PushButton::moveToButton()
         return resp;
     }
 }
+
+// void PushButton::selectButton(int select_type)
+// {
+//     switch (select_type)
+//     {
+//     case OPEN:
+
+//         break;
+    
+//     default:
+//         break;
+//     }
+// }
 
 void PushButton::update()
 {
