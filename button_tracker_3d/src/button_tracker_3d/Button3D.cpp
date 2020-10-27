@@ -19,7 +19,8 @@
 
 #include <ros/ros.h>
 
-#include <visualization_msgs/MarkerArray.h>
+// #include <visualization_msgs/MarkerArray.h>
+#include <button_recognition_msgs/MarkerArray.h>
 
 #include <pcl_ros/transforms.h>
 #include <pcl_conversions/pcl_conversions.h>
@@ -37,7 +38,8 @@ Button3D::Button3D():
   initParams();
 
   button3d_pub_ = nh_.advertise<gb_visual_detection_3d_msgs::BoundingBoxes3d>(output_bbx3d_topic_, 100);
-  markers_pub_ = nh_.advertise<visualization_msgs::MarkerArray>("/button_tracker_3d/markers", 100);
+  markers_pub_ = nh_.advertise<button_recognition_msgs::MarkerArray>("/button_tracker_3d/markers", 100);
+  // markers_pub_ = nh_.advertise<visualization_msgs::MarkerArray>("/button_tracker_3d/markers", 100);
 
   yolo_sub_ = nh_.subscribe(input_bbx_topic_, 1, &Button3D::buttonCb, this);
   pointCloud_sub_ = nh_.subscribe(pointcloud_topic_, 1, &Button3D::pointCloudCb, this);
@@ -95,60 +97,53 @@ Button3D::calculate_boxes(const sensor_msgs::PointCloud2& cloud_pc2,
     // {
     //   continue;
     // }
-    if (bbx.Class == "3" || bbx.Class == "2") 
-    { 
-      int center_x, center_y;
+    int center_x, center_y;
 
-      center_x = (bbx.xmax + bbx.xmin) / 2;
-      center_y = (bbx.ymax + bbx.ymin) / 2;
+    center_x = (bbx.xmax + bbx.xmin) / 2;
+    center_y = (bbx.ymax + bbx.ymin) / 2;
 
-      int pcl_index = (center_y* cloud_pc2.width) + center_x;
-      pcl::PointXYZRGB center_point =  cloud_pcl->at(pcl_index);
+    int pcl_index = (center_y* cloud_pc2.width) + center_x;
+    pcl::PointXYZRGB center_point =  cloud_pcl->at(pcl_index);
 
-      if (std::isnan(center_point.x))
-        continue;
-
-      float maxx, minx, maxy, miny, maxz, minz;
-
-      maxx = maxy = maxz =  -std::numeric_limits<float>::max();
-      minx = miny = minz =  std::numeric_limits<float>::max();
-
-      for (int i = bbx.xmin; i < bbx.xmax; i++)
-        for (int j = bbx.ymin; j < bbx.ymax; j++)
-        {
-          pcl_index = (j* cloud_pc2.width) + i;
-          pcl::PointXYZRGB point =  cloud_pcl->at(pcl_index);
-
-          if (std::isnan(point.x))
-            continue;
-
-          if (fabs(point.x - center_point.x) > mininum_detection_thereshold_)
-            continue;
-
-          maxx = std::max(point.x, maxx);
-          maxy = std::max(point.y, maxy);
-          maxz = std::max(point.z, maxz);
-          minx = std::min(point.x, minx);
-          miny = std::min(point.y, miny);
-          minz = std::min(point.z, minz);
-        }
-
-      gb_visual_detection_3d_msgs::BoundingBox3d bbx_msg;
-      bbx_msg.Class = bbx.Class;
-      bbx_msg.probability = bbx.probability;
-      bbx_msg.xmin = minx;
-      bbx_msg.xmax = maxx;
-      bbx_msg.ymin = miny;
-      bbx_msg.ymax = maxy;
-      bbx_msg.zmin = minz;
-      bbx_msg.zmax = maxz;
-
-      boxes->bounding_boxes.push_back(bbx_msg);
-    }
-    else
-    {
+    if (std::isnan(center_point.x))
       continue;
-    }
+
+    float maxx, minx, maxy, miny, maxz, minz;
+
+    maxx = maxy = maxz =  -std::numeric_limits<float>::max();
+    minx = miny = minz =  std::numeric_limits<float>::max();
+
+    for (int i = bbx.xmin; i < bbx.xmax; i++)
+      for (int j = bbx.ymin; j < bbx.ymax; j++)
+      {
+        pcl_index = (j* cloud_pc2.width) + i;
+        pcl::PointXYZRGB point =  cloud_pcl->at(pcl_index);
+
+        if (std::isnan(point.x))
+          continue;
+
+        if (fabs(point.x - center_point.x) > mininum_detection_thereshold_)
+          continue;
+
+        maxx = std::max(point.x, maxx);
+        maxy = std::max(point.y, maxy);
+        maxz = std::max(point.z, maxz);
+        minx = std::min(point.x, minx);
+        miny = std::min(point.y, miny);
+        minz = std::min(point.z, minz);
+      }
+
+    gb_visual_detection_3d_msgs::BoundingBox3d bbx_msg;
+    bbx_msg.Class = bbx.Class;
+    bbx_msg.probability = bbx.probability;
+    bbx_msg.xmin = minx;
+    bbx_msg.xmax = maxx;
+    bbx_msg.ymin = miny;
+    bbx_msg.ymax = maxy;
+    bbx_msg.zmin = minz;
+    bbx_msg.zmax = maxz;
+
+    boxes->bounding_boxes.push_back(bbx_msg);
   }
 }
 
@@ -191,19 +186,22 @@ Button3D::update()
 void
 Button3D::publish_markers(const gb_visual_detection_3d_msgs::BoundingBoxes3d& boxes)
 {
-  visualization_msgs::MarkerArray msg;
+  // visualization_msgs::MarkerArray msg;
+  button_recognition_msgs::MarkerArray msg;
 
   int counter_id = 0;
   for (auto bb : boxes.bounding_boxes)
   {
-    visualization_msgs::Marker bbx_marker;
+    // visualization_msgs::Marker bbx_marker;
+    button_recognition_msgs::Marker bbx_marker;
 
     bbx_marker.header.frame_id = boxes.header.frame_id;
     bbx_marker.header.stamp = boxes.header.stamp;
     bbx_marker.ns = "button3d";
     bbx_marker.id = counter_id++;
-    bbx_marker.type = visualization_msgs::Marker::CUBE;
-    bbx_marker.action = visualization_msgs::Marker::ADD;
+    bbx_marker.Class = bb.Class;
+    bbx_marker.type = button_recognition_msgs::Marker::CUBE;
+    bbx_marker.action = button_recognition_msgs::Marker::ADD;
     bbx_marker.pose.position.x = (bb.xmax + bb.xmin) / 2.0;
     bbx_marker.pose.position.y = (bb.ymax + bb.ymin) / 2.0;
     bbx_marker.pose.position.z = (bb.zmax + bb.zmin) / 2.0;
