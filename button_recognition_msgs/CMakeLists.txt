@@ -54,6 +54,8 @@ add_message_files(
   BoundingBox.msg
   BoundingBoxes.msg
   ObjectCount.msg
+  Marker.msg
+  MarkerArray.msg
 )
 
 ## Generate services in the 'srv' folder
