@@ -13,14 +13,19 @@ from button_recognition_msgs.msg import BoundingBox, BoundingBoxes
 # from button_tracker.msg import BoundingBox, BoundingBoxes
 from cv_bridge import CvBridge, CvBridgeError
 import time
-import pycuda.driver as cuda
-import pycuda.autoinit
-from pycuda.compiler import SourceModule
+# import pycuda.driver as cuda
+# import pycuda.autoinit
+# from pycuda.compiler import SourceModule
+
+from threading import Thread
+from multiprocessing import Queue
 
 counter = 0
 prevTime = 0
 
 rgb_images = None
+frame_ = None
+input_q = Queue(5000)
 
 class ButtonTracker:
       
@@ -79,102 +84,68 @@ class ButtonTracker:
       img_thumbnail = img_pil.thumbnail((640, 480), Image.ANTIALIAS)
       delta_w, delta_h= 640 - img_pil.size[0], 480 - img_pil.size[1]
       padding = (delta_w // 2, delta_h // 2, delta_w - (delta_w // 2), delta_h - (delta_h // 2))
-      new_im = ImageOps.expand(img_pil, padding)
-      img = np.copy(np.asarray(new_im))
-    return img
+
 
 class ButtonRead:
     
     def __init__(self):
         self.bridge = CvBridge()
+        
 
-        self.mod = SourceModule("""
-            __global__ void doublify(float *a)
-            {
-                int idx = threadIdx.x + threadIdx.y*4;
-                a[idx] *= 1;
-            }
-            """)
+        # self.mod = SourceModule("""
+        #     __global__ void doublify(float *a)
+        #     {
+        #         int idx = threadIdx.x + threadIdx.y*4;
+        #         a[idx] *= 1;
+        #     }
+        #     """)
 
-        rospy.Subscriber('/camera/color/image_raw', Image_, self.imageCallback)
+        rospy.Subscriber('/camera/color/image', Image_, self.imageCallback, queue_size=1)
 
     def imageCallback(self, ros_image):
         global rgb_images
         try:
             color_image = self.bridge.imgmsg_to_cv2(ros_image, "bgr8")
             rgb_images = color_image
+            input_q.put(rgb_images)
         except CvBridgeError, e:
             print e
             #Convert the depth image to a Numpy array
             color_array = np.array(color_image, dtype=np.float32)
 
+                
+    # def cudaImg(self):
+    #     img = input_q.get()
+    #     img_gpu = cuda.mem_alloc(img.nbytes)
+    #     cuda.memcpy_htod(img_gpu, img)
 
-    def cudaImg(self):
-        img_gpu = cuda.mem_alloc(rgb_images.nbytes)
-        cuda.memcpy_htod(img_gpu, rgb_images)
+    #     func = self.mod.get_function("doublify")
+    #     func(img_gpu, block=(4, 4, 1))
 
-        func = self.mod.get_function("doublify")
-        func(img_gpu, block=(4, 4, 1))
+    #     img_doubled = np.empty_like(img)
+    #     cuda.memcpy_dtoh(img_doubled, img_gpu)
 
-        img_doubled = np.empty_like(rgb_images)
-        cuda.memcpy_dtoh(img_doubled, img_gpu)
-
-        return img_doubled
+    #     return img_doubled
 
     def showImages(self):
         button_tracker = ButtonTracker()
         
         while True:
 
-            boundingbox = BoundingBox()
-            boundingboxes = BoundingBoxes()
+            # boundingbox = BoundingBox()
+            # boundingboxes = BoundingBoxes()
 
-            cuda_image = self.cudaImg()
-            frame = button_tracker.resize_to_480x680(cuda_image)
+            # frame = self.cudaImg()
+            frame = input_q.get()
+            # frame = button_tracker.resize_to_480x680(img)
             (boxes, scores, texts, beliefs) = button_tracker.call_for_service(frame)
             button_tracker.init_tracker(frame, boxes)
-            # print("boxes: ", boxes)
-            # display recognition result
+            
             for box, text in zip(boxes, texts):
-              # if text == '4':
-                # button_tracker.visuxalize_recognitions(frame, box, text)
-
-                # boundingbox.xmin = int(box[0])
-                # boundingbox.ymin = int(box[1])
-                # boundingbox.xmax = int(box[2])
-                # boundingbox.ymax = int(box[3])
-                # boundingbox.Class = text
-
-                # self.pub.publish(boundingbox)
-
-              ##################################################################
                 button_tracker.visualize_recognitions(frame, box, text)
-                # boundingbox.xmin = int(box[0])
-                # boundingbox.ymin = int(box[1])
-                # boundingbox.xmax = int(box[2])
-                # boundingbox.ymax = int(box[3])
-                # boundingbox.id = i
-                # boundingbox.probability = 2.0
-                # boundingbox.Class = text
-                # # print("bounding boxes: {}".format(boundingbox))
-                  
-                # boundingboxes.bounding_boxes.append(boundingbox)
-                # i += 1
-                # j += 1.0
-              ##################################################################
-              
-            # boundingboxes.header.stamp = rospy.Time.now()
-            # boundingboxes.header.frame_id = "detection"
-
-            # self.pub.publish(boundingboxes)
-            # i += 1
-
-                # print(box)
-              # print("number: {}".format(text))
-            # print("bounding boxes: ".format(boundingbox))
-            # depth_test()
+               
             self.show_fps(frame)
-
+          
             cv2.imshow('button_recognition', frame)
               
             k = cv2.waitKey(1) & 0xFF
@@ -194,14 +165,6 @@ class ButtonRead:
         fps = 1 / (sec)
         fps_text = "FPS : %0.1f" % fps
         cv2.putText(frame, fps_text, (0, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0))
-
-    def read_video_and_recognize(self, video_name):
-        if not os.path.exists(video_name):
-          raise IOError('Invalid video path or device number!')
-        
-        rospy.Subscriber('/camera/color/image_raw', Image_, self.convert_color_image, queue_size=10)
-        self.convert_color_image()
-        rospy.spin()
 
 
 if __name__ == '__main__':
