@@ -390,9 +390,9 @@ bool PushButton::moveToGoalButton()
                 ROS_INFO_STREAM(pushButtonPose.pose);
 
                 srv.request.kinematics_pose.pose.position = forwardButtonPosition(srv.request.kinematics_pose.pose.position, 0.05);
-                // srv.request.kinematics_pose.pose.position.x += 0.01;
+                srv.request.kinematics_pose.pose.position.x -= 0.01;
                 srv.request.kinematics_pose.pose.position.y -= 0.015;
-                srv.request.kinematics_pose.pose.position.z += 0.015;
+                srv.request.kinematics_pose.pose.position.z -= 0.015;
 
                 double moveDistance = sqrt(pow((srv.request.kinematics_pose.pose.position.x - currentToolPose.position.x), 2)
                                         +  pow((srv.request.kinematics_pose.pose.position.y - currentToolPose.position.y), 2)
@@ -597,8 +597,8 @@ bool PushButton::moveToButton(std::string target)
 
                 srv.request.kinematics_pose.pose.position = forwardButtonPosition(srv.request.kinematics_pose.pose.position, 0.05);
                 // srv.request.kinematics_pose.pose.position.x += 0.01;
-                srv.request.kinematics_pose.pose.position.y -= 0.015;
-                srv.request.kinematics_pose.pose.position.z -= 0.015;
+                srv.request.kinematics_pose.pose.position.y -= 0.02;
+                srv.request.kinematics_pose.pose.position.z -= 0.04;
 
                 double moveDistance = sqrt(pow((srv.request.kinematics_pose.pose.position.x - currentToolPose.position.x), 2)
                                         +  pow((srv.request.kinematics_pose.pose.position.y - currentToolPose.position.y), 2)
@@ -648,18 +648,6 @@ bool PushButton::moveToButton(std::string target)
 
 bool PushButton::setButtonType()
 {
-    std::cout << button << std::endl;
-
-    // for (int i = 0; i < stack_size; i++)
-    // {   
-    //     std::cout << button_floor[i] << std::endl;
-    //     if (button_floor[i] == LIFT_UP || button_floor[i] == goal_button || 
-    //         button_floor[i] == STARTING_POINT || button_floor[i] == LIFT_DOWN)
-    //     {
-    //         moveToButton();
-    //     }
-    // }
-
     if (button == LIFT_UP)
     {
         ROS_INFO("move to up button node");
