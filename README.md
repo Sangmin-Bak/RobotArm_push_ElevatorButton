@@ -28,7 +28,7 @@ git clone https://github.com/sm315/RobotArm_push_ElevatorButton.git
 cd ~/catkin_ws && catkin_make
 
 cd ~/catkin_ws/src/RobotArm_push_ElevatorButton/open_manipulator_libs/src
-cp open_manipulator.cpp ~/catkin_ws/src/open_manipulator_libs/src/
+cp open_manipulator.cpp ~/catkin_ws/src/open_manipulator/open_manipulator_libs/src/
 
 cd ~/catkin_ws/src/RobotArm_push_ElevatorButton/robotis_manipulator
 cp -r include/ ~/catkin_ws/src/robotis_manipulator
