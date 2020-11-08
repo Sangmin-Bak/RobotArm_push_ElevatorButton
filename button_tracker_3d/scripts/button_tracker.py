@@ -10,22 +10,13 @@ from sensor_msgs.msg import Image as Image_
 from sensor_msgs.msg import CompressedImage
 # from darknet_ros_msgs.msg import BoundingBox, BoundingBoxes
 from button_recognition_msgs.msg import BoundingBox, BoundingBoxes
-# from button_tracker.msg import BoundingBox, BoundingBoxes
 from cv_bridge import CvBridge, CvBridgeError
 import time
-# import pycuda.driver as cuda
-# import pycuda.autoinit
-# from pycuda.compiler import SourceModule
-
-from threading import Thread
-from multiprocessing import Queue
 
 counter = 0
 prevTime = 0
 
 rgb_images = None
-frame_ = None
-input_q = Queue(5000)
 
 class ButtonTracker:
       
@@ -90,15 +81,6 @@ class ButtonRead:
     
     def __init__(self):
         self.bridge = CvBridge()
-        
-
-        # self.mod = SourceModule("""
-        #     __global__ void doublify(float *a)
-        #     {
-        #         int idx = threadIdx.x + threadIdx.y*4;
-        #         a[idx] *= 1;
-        #     }
-        #     """)
 
         rospy.Subscriber('/camera/color/image', Image_, self.imageCallback, queue_size=1)
 
@@ -107,37 +89,16 @@ class ButtonRead:
         try:
             color_image = self.bridge.imgmsg_to_cv2(ros_image, "bgr8")
             rgb_images = color_image
-            input_q.put(rgb_images)
         except CvBridgeError, e:
             print e
             #Convert the depth image to a Numpy array
             color_array = np.array(color_image, dtype=np.float32)
 
-                
-    # def cudaImg(self):
-    #     img = input_q.get()
-    #     img_gpu = cuda.mem_alloc(img.nbytes)
-    #     cuda.memcpy_htod(img_gpu, img)
-
-    #     func = self.mod.get_function("doublify")
-    #     func(img_gpu, block=(4, 4, 1))
-
-    #     img_doubled = np.empty_like(img)
-    #     cuda.memcpy_dtoh(img_doubled, img_gpu)
-
-    #     return img_doubled
-
     def showImages(self):
         button_tracker = ButtonTracker()
         
         while True:
-
-            # boundingbox = BoundingBox()
-            # boundingboxes = BoundingBoxes()
-
-            # frame = self.cudaImg()
-            frame = input_q.get()
-            # frame = button_tracker.resize_to_480x680(img)
+            frame = rgb_images
             (boxes, scores, texts, beliefs) = button_tracker.call_for_service(frame)
             button_tracker.init_tracker(frame, boxes)
             
