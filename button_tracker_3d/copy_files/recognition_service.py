@@ -8,7 +8,7 @@ from button_recognition.msg import recognition
 from button_recognition.msg import recog_result
 from button_recognition.srv import *
 from ocr_rcnn_lib.button_recognition import ButtonRecognizer
-from darknet_ros_msgs.msg import BoundingBox, BoundingBoxes
+from button_recognition_msgs import BoundingBox, BoundingBoxes
 
 class RecognitionService:
   def __init__(self, model):
