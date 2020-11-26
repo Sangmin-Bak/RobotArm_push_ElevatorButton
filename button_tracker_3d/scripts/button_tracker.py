@@ -19,7 +19,6 @@ prevTime = 0
 rgb_images = None
 
 class ButtonTracker:
-      
   def __init__(self):
     self.detected_box = None
     self.tracker = None
@@ -55,7 +54,6 @@ class ButtonTracker:
 
   @staticmethod
   def visualize_recognitions(frame, box, text):
-
     # draw bounding boxes
     p1, p2 = (int(box[0]), int(box[1])), (int(box[2]), int(box[3]))
     cv2.rectangle(frame, p1, p2, (50, 220, 100), thickness=2)
@@ -77,8 +75,7 @@ class ButtonTracker:
       padding = (delta_w // 2, delta_h // 2, delta_w - (delta_w // 2), delta_h - (delta_h // 2))
 
 
-class ButtonRead:
-    
+class ReadVideoRecognition:
     def __init__(self):
         self.bridge = CvBridge()
 
@@ -132,18 +129,15 @@ if __name__ == '__main__':
     
     img_only = rospy.get_param('button_tracker/img_only', False)
 
-    read_btn = ButtonRead()
+    read_video = ReadVideoRecognition()
     rospy.init_node('button_tracker', anonymous=True)
     try:
-        show_video = read_btn.showImages()
+        show_video = read_video.showImages()
         if show_video == 0:
             rospy.signal_shutdown ("reason")
-
         rospy.spin()
-
     except KeyboardInterrupt:
         print("Shutting down")
     cv2.destroyAllWindows()	 
-        
     
     rospy.loginfo('Process Finished!')
