@@ -82,7 +82,7 @@ class ButtonRead:
     def __init__(self):
         self.bridge = CvBridge()
 
-        rospy.Subscriber('/camera/color/image', Image_, self.imageCallback, queue_size=1)
+        rospy.Subscriber('/camera/color/image', Image_, self.imageCallback, queue_size=10)
 
     def imageCallback(self, ros_image):
         global rgb_images

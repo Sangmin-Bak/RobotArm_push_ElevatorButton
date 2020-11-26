@@ -1,10 +1,11 @@
 <?xml version="1.0"?>
 <launch>
   <!--<include file="$(find realsense2_camera)/launch/rs_rgbd.launch"/>-->
- 
+  <!-- <node pkg="image_transport" type="republish" name="image_republisher" output="screen">
+    <param name= -->
   
   <node pkg="button_tracker_3d" type="button_tracker.py" name="button_tracker" output="screen"/>
   <node pkg="button_tracker_3d" type="button3d_node" name="button_3d" output="screen">
-    <!-- <rosparam command="load" file="$(find button_tracker_3d)/config/button_tracker_3d.yaml"/> -->
+    <rosparam command="load" file="$(find button_tracker_3d)/config/button_tracker_3d.yaml"/>
   </node>
 </launch>

@@ -54,7 +54,7 @@ Button3D::initParams()
   input_bbx_topic_ = "/button_recognition/bounding_boxes";
   output_bbx3d_topic_ = "/button_tracker_3d/bounding_boxes";
   pointcloud_topic_ = "/camera/depth_registered/points";
-  working_frame_ = "/world";
+  working_frame_ = "/link1";
   mininum_detection_thereshold_ = 0.5f;
   minimum_probability_ = 0.3f;
 
