@@ -42,6 +42,8 @@ PushButton::PushButton()
     marker_point_sub = nh_.subscribe("/button_tracker_3d/markers", 10, &PushButton::markerCallback, this);
     floor_sub = nh_.subscribe("/floor", 10, &PushButton::floorCallback, this);
 
+    ros::param::get("/move_elevator", move_elevator);
+
     button = LIFT_UP;
 }
 
@@ -300,283 +302,283 @@ geometry_msgs::Point PushButton::forwardButtonPosition(geometry_msgs::Point butt
     return resultPoint;
 }
 
-bool PushButton::moveToUpButton()
-{
-    bool resp = false;
+// bool PushButton::moveToUpButton()
+// {
+//     bool resp = false;
 
-    if (pushButtonPose.pose.position.x > 0)
-    {   
-        ROS_WARN("move to button");
+//     if (pushButtonPose.pose.position.x > 0)
+//     {   
+//         ROS_WARN("move to button");
 
-        for (int i = 0; i < stack_size; i++)
-        {   
-            // std::cout << target << std::endl;
-            if (button_floor[i] == LIFT_UP)
-            {
-                open_manipulator_msgs::SetKinematicsPose srv;
-                srv.request.end_effector_name = "gripper";
-                srv.request.planning_group = "arm";
-                srv.request.kinematics_pose.pose = pushButtonPose.pose;
-                // kinematics_pose.pose = pushButtonPose.pose;
+//         for (int i = 0; i < stack_size; i++)
+//         {   
+//             // std::cout << target << std::endl;
+//             if (button_floor[i] == LIFT_UP)
+//             {
+//                 open_manipulator_msgs::SetKinematicsPose srv;
+//                 srv.request.end_effector_name = "gripper";
+//                 srv.request.planning_group = "arm";
+//                 srv.request.kinematics_pose.pose = pushButtonPose.pose;
+//                 // kinematics_pose.pose = pushButtonPose.pose;
 
-                ROS_INFO_STREAM(pushButtonPose.header);
-                ROS_INFO_STREAM(pushButtonPose.pose);
+//                 ROS_INFO_STREAM(pushButtonPose.header);
+//                 ROS_INFO_STREAM(pushButtonPose.pose);
 
-                srv.request.kinematics_pose.pose.position = forwardButtonPosition(srv.request.kinematics_pose.pose.position, 0.05);
-                // srv.request.kinematics_pose.pose.position.x += 0.01;
-                srv.request.kinematics_pose.pose.position.y -= 0.015;
-                // srv.request.kinematics_pose.pose.position.z += 0.015;
+//                 srv.request.kinematics_pose.pose.position = forwardButtonPosition(srv.request.kinematics_pose.pose.position, 0.05);
+//                 // srv.request.kinematics_pose.pose.position.x += 0.01;
+//                 srv.request.kinematics_pose.pose.position.y -= 0.015;
+//                 // srv.request.kinematics_pose.pose.position.z += 0.015;
 
-                double moveDistance = sqrt(pow((srv.request.kinematics_pose.pose.position.x - currentToolPose.position.x), 2)
-                                        +  pow((srv.request.kinematics_pose.pose.position.y - currentToolPose.position.y), 2)
-                                        +  pow((srv.request.kinematics_pose.pose.position.z - currentToolPose.position.z), 2));
+//                 double moveDistance = sqrt(pow((srv.request.kinematics_pose.pose.position.x - currentToolPose.position.x), 2)
+//                                         +  pow((srv.request.kinematics_pose.pose.position.y - currentToolPose.position.y), 2)
+//                                         +  pow((srv.request.kinematics_pose.pose.position.z - currentToolPose.position.z), 2));
 
-                srv.request.path_time = moveDistance * 10.0;
-                double operating_time = srv.request.path_time;
-                double operating_limit_time = operating_time;
+//                 srv.request.path_time = moveDistance * 10.0;
+//                 double operating_time = srv.request.path_time;
+//                 double operating_limit_time = operating_time;
 
-                if (operating_time < 1.0)
-                {
-                    operating_limit_time = 1.0;
-                }
-                else if (operating_time > 3.0)
-                {
-                    operating_limit_time = 3.0;
-                }
+//                 if (operating_time < 1.0)
+//                 {
+//                     operating_limit_time = 1.0;
+//                 }
+//                 else if (operating_time > 3.0)
+//                 {
+//                     operating_limit_time = 3.0;
+//                 }
 
-                ROS_WARN("go xyz %.2f,%.2f,%.2f , moveDistance %.2f, operate time %.2f ( %.2f )", \
-                        srv.request.kinematics_pose.pose.position.x, srv.request.kinematics_pose.pose.position.y, srv.request.kinematics_pose.pose.position.z, \
-                        moveDistance, operating_time, operating_limit_time);
+//                 ROS_WARN("go xyz %.2f,%.2f,%.2f , moveDistance %.2f, operate time %.2f ( %.2f )", \
+//                         srv.request.kinematics_pose.pose.position.x, srv.request.kinematics_pose.pose.position.y, srv.request.kinematics_pose.pose.position.z, \
+//                         moveDistance, operating_time, operating_limit_time);
 
-                try
-                {
-                    resp = set_kinematics_position.call(srv);
-                    button = goal_button;
-                }
-                catch(const ros::Exception& e)
-                {
-                    std::cout << "Service call failed: " << &e << std::endl;
-                    return false;
-                }
-            }
-        }
-    }
-    else
-    {
-        ROS_INFO("Cannot go to the position of the button");
-        return resp;
-    }
-}
+//                 try
+//                 {
+//                     resp = set_kinematics_position.call(srv);
+//                     button = goal_button;
+//                 }
+//                 catch(const ros::Exception& e)
+//                 {
+//                     std::cout << "Service call failed: " << &e << std::endl;
+//                     return false;
+//                 }
+//             }
+//         }
+//     }
+//     else
+//     {
+//         ROS_INFO("Cannot go to the position of the button");
+//         return resp;
+//     }
+// }
 
-bool PushButton::moveToGoalButton()
-{
-    bool resp = false;
+// bool PushButton::moveToGoalButton()
+// {
+//     bool resp = false;
 
-    if (pushButtonPose.pose.position.x > 0)
-    {   
-        ROS_WARN("move to button");
+//     if (pushButtonPose.pose.position.x > 0)
+//     {   
+//         ROS_WARN("move to button");
 
-        for (auto target : button_floor)
-        {
-            if (target == goal_button)
-            {
-                open_manipulator_msgs::SetKinematicsPose srv;
-                srv.request.end_effector_name = "gripper";
-                srv.request.planning_group = "arm";
-                srv.request.kinematics_pose.pose = pushButtonPose.pose;
-                // kinematics_pose.pose = pushButtonPose.pose;
+//         for (auto target : button_floor)
+//         {
+//             if (target == goal_button)
+//             {
+//                 open_manipulator_msgs::SetKinematicsPose srv;
+//                 srv.request.end_effector_name = "gripper";
+//                 srv.request.planning_group = "arm";
+//                 srv.request.kinematics_pose.pose = pushButtonPose.pose;
+//                 // kinematics_pose.pose = pushButtonPose.pose;
 
-                ROS_INFO_STREAM(pushButtonPose.header);
-                ROS_INFO_STREAM(pushButtonPose.pose);
+//                 ROS_INFO_STREAM(pushButtonPose.header);
+//                 ROS_INFO_STREAM(pushButtonPose.pose);
 
-                srv.request.kinematics_pose.pose.position = forwardButtonPosition(srv.request.kinematics_pose.pose.position, 0.05);
-                srv.request.kinematics_pose.pose.position.x -= 0.01;
-                srv.request.kinematics_pose.pose.position.y -= 0.015;
-                srv.request.kinematics_pose.pose.position.z -= 0.015;
+//                 srv.request.kinematics_pose.pose.position = forwardButtonPosition(srv.request.kinematics_pose.pose.position, 0.05);
+//                 srv.request.kinematics_pose.pose.position.x -= 0.01;
+//                 srv.request.kinematics_pose.pose.position.y -= 0.015;
+//                 srv.request.kinematics_pose.pose.position.z -= 0.015;
 
-                double moveDistance = sqrt(pow((srv.request.kinematics_pose.pose.position.x - currentToolPose.position.x), 2)
-                                        +  pow((srv.request.kinematics_pose.pose.position.y - currentToolPose.position.y), 2)
-                                        +  pow((srv.request.kinematics_pose.pose.position.z - currentToolPose.position.z), 2));
+//                 double moveDistance = sqrt(pow((srv.request.kinematics_pose.pose.position.x - currentToolPose.position.x), 2)
+//                                         +  pow((srv.request.kinematics_pose.pose.position.y - currentToolPose.position.y), 2)
+//                                         +  pow((srv.request.kinematics_pose.pose.position.z - currentToolPose.position.z), 2));
 
-                srv.request.path_time = moveDistance * 10.0;
-                double operating_time = srv.request.path_time;
-                double operating_limit_time = operating_time;
+//                 srv.request.path_time = moveDistance * 10.0;
+//                 double operating_time = srv.request.path_time;
+//                 double operating_limit_time = operating_time;
 
-                if (operating_time < 1.0)
-                {
-                    operating_limit_time = 1.0;
-                }
-                else if (operating_time > 3.0)
-                {
-                    operating_limit_time = 3.0;
-                }
+//                 if (operating_time < 1.0)
+//                 {
+//                     operating_limit_time = 1.0;
+//                 }
+//                 else if (operating_time > 3.0)
+//                 {
+//                     operating_limit_time = 3.0;
+//                 }
 
-                ROS_WARN("go xyz %.2f,%.2f,%.2f , moveDistance %.2f, operate time %.2f ( %.2f )", \
-                        srv.request.kinematics_pose.pose.position.x, srv.request.kinematics_pose.pose.position.y, srv.request.kinematics_pose.pose.position.z, \
-                        moveDistance, operating_time, operating_limit_time);
+//                 ROS_WARN("go xyz %.2f,%.2f,%.2f , moveDistance %.2f, operate time %.2f ( %.2f )", \
+//                         srv.request.kinematics_pose.pose.position.x, srv.request.kinematics_pose.pose.position.y, srv.request.kinematics_pose.pose.position.z, \
+//                         moveDistance, operating_time, operating_limit_time);
 
-                try
-                {
-                    resp = set_kinematics_position.call(srv);
-                    button = STARTING_POINT;
-                }
-                catch(const ros::Exception& e)
-                {
-                    std::cout << "Service call failed: " << &e << std::endl;
-                    return false;
-                }
+//                 try
+//                 {
+//                     resp = set_kinematics_position.call(srv);
+//                     button = STARTING_POINT;
+//                 }
+//                 catch(const ros::Exception& e)
+//                 {
+//                     std::cout << "Service call failed: " << &e << std::endl;
+//                     return false;
+//                 }
 
-            }
-        }
-    }
-    else
-    {
-        ROS_INFO("Cannot go to the position of the button");
-        return resp;
-    }
-}
+//             }
+//         }
+//     }
+//     else
+//     {
+//         ROS_INFO("Cannot go to the position of the button");
+//         return resp;
+//     }
+// }
 
-bool PushButton::moveToStartPointButton()
-{
-    bool resp = false;
+// bool PushButton::moveToStartPointButton()
+// {
+//     bool resp = false;
 
-    if (pushButtonPose.pose.position.x > 0)
-    {   
-        ROS_WARN("move to button");
+//     if (pushButtonPose.pose.position.x > 0)
+//     {   
+//         ROS_WARN("move to button");
 
-        for (auto target : button_floor)
-        {
-            if (target == STARTING_POINT)
-            {
-                open_manipulator_msgs::SetKinematicsPose srv;
-                srv.request.end_effector_name = "gripper";
-                srv.request.planning_group = "arm";
-                srv.request.kinematics_pose.pose = pushButtonPose.pose;
-                // kinematics_pose.pose = pushButtonPose.pose;
+//         for (auto target : button_floor)
+//         {
+//             if (target == STARTING_POINT)
+//             {
+//                 open_manipulator_msgs::SetKinematicsPose srv;
+//                 srv.request.end_effector_name = "gripper";
+//                 srv.request.planning_group = "arm";
+//                 srv.request.kinematics_pose.pose = pushButtonPose.pose;
+//                 // kinematics_pose.pose = pushButtonPose.pose;
 
-                ROS_INFO_STREAM(pushButtonPose.header);
-                ROS_INFO_STREAM(pushButtonPose.pose);
+//                 ROS_INFO_STREAM(pushButtonPose.header);
+//                 ROS_INFO_STREAM(pushButtonPose.pose);
 
-                srv.request.kinematics_pose.pose.position = forwardButtonPosition(srv.request.kinematics_pose.pose.position, 0.05);
-                // srv.request.kinematics_pose.pose.position.x += 0.01;
-                srv.request.kinematics_pose.pose.position.y -= 0.015;
-                srv.request.kinematics_pose.pose.position.z += 0.015;
+//                 srv.request.kinematics_pose.pose.position = forwardButtonPosition(srv.request.kinematics_pose.pose.position, 0.05);
+//                 // srv.request.kinematics_pose.pose.position.x += 0.01;
+//                 srv.request.kinematics_pose.pose.position.y -= 0.015;
+//                 srv.request.kinematics_pose.pose.position.z += 0.015;
 
-                double moveDistance = sqrt(pow((srv.request.kinematics_pose.pose.position.x - currentToolPose.position.x), 2)
-                                        +  pow((srv.request.kinematics_pose.pose.position.y - currentToolPose.position.y), 2)
-                                        +  pow((srv.request.kinematics_pose.pose.position.z - currentToolPose.position.z), 2));
+//                 double moveDistance = sqrt(pow((srv.request.kinematics_pose.pose.position.x - currentToolPose.position.x), 2)
+//                                         +  pow((srv.request.kinematics_pose.pose.position.y - currentToolPose.position.y), 2)
+//                                         +  pow((srv.request.kinematics_pose.pose.position.z - currentToolPose.position.z), 2));
 
-                srv.request.path_time = moveDistance * 10.0;
-                double operating_time = srv.request.path_time;
-                double operating_limit_time = operating_time;
+//                 srv.request.path_time = moveDistance * 10.0;
+//                 double operating_time = srv.request.path_time;
+//                 double operating_limit_time = operating_time;
 
-                if (operating_time < 1.0)
-                {
-                    operating_limit_time = 1.0;
-                }
-                else if (operating_time > 3.0)
-                {
-                    operating_limit_time = 3.0;
-                }
+//                 if (operating_time < 1.0)
+//                 {
+//                     operating_limit_time = 1.0;
+//                 }
+//                 else if (operating_time > 3.0)
+//                 {
+//                     operating_limit_time = 3.0;
+//                 }
 
-                ROS_WARN("go xyz %.2f,%.2f,%.2f , moveDistance %.2f, operate time %.2f ( %.2f )", \
-                        srv.request.kinematics_pose.pose.position.x, srv.request.kinematics_pose.pose.position.y, srv.request.kinematics_pose.pose.position.z, \
-                        moveDistance, operating_time, operating_limit_time);
+//                 ROS_WARN("go xyz %.2f,%.2f,%.2f , moveDistance %.2f, operate time %.2f ( %.2f )", \
+//                         srv.request.kinematics_pose.pose.position.x, srv.request.kinematics_pose.pose.position.y, srv.request.kinematics_pose.pose.position.z, \
+//                         moveDistance, operating_time, operating_limit_time);
 
-                try
-                {
-                    resp = set_kinematics_position.call(srv);
-                    button = LIFT_DOWN;
-                }
-                catch(const ros::Exception& e)
-                {
-                    std::cout << "Service call failed: " << &e << std::endl;
-                    return false;
-                }
+//                 try
+//                 {
+//                     resp = set_kinematics_position.call(srv);
+//                     button = LIFT_DOWN;
+//                 }
+//                 catch(const ros::Exception& e)
+//                 {
+//                     std::cout << "Service call failed: " << &e << std::endl;
+//                     return false;
+//                 }
                 
-            }
-        }
-    }
-    else
-    {
-        ROS_INFO("Cannot go to the position of the button");
-        return resp;
-    }
-}
+//             }
+//         }
+//     }
+//     else
+//     {
+//         ROS_INFO("Cannot go to the position of the button");
+//         return resp;
+//     }
+// }
 
-bool PushButton::moveToDownButton()
-{
-    bool resp = false;
+// bool PushButton::moveToDownButton()
+// {
+//     bool resp = false;
 
-    if (pushButtonPose.pose.position.x > 0)
-    {   
-        ROS_WARN("move to button");
+//     if (pushButtonPose.pose.position.x > 0)
+//     {   
+//         ROS_WARN("move to button");
 
-        for (auto target : button_floor)
-        {
-            if (target == LIFT_DOWN)
-            {
-                open_manipulator_msgs::SetKinematicsPose srv;
-                srv.request.end_effector_name = "gripper";
-                srv.request.planning_group = "arm";
-                srv.request.kinematics_pose.pose = pushButtonPose.pose;
-                // kinematics_pose.pose = pushButtonPose.pose;
+//         for (auto target : button_floor)
+//         {
+//             if (target == LIFT_DOWN)
+//             {
+//                 open_manipulator_msgs::SetKinematicsPose srv;
+//                 srv.request.end_effector_name = "gripper";
+//                 srv.request.planning_group = "arm";
+//                 srv.request.kinematics_pose.pose = pushButtonPose.pose;
+//                 // kinematics_pose.pose = pushButtonPose.pose;
 
-                ROS_INFO_STREAM(pushButtonPose.header);
-                ROS_INFO_STREAM(pushButtonPose.pose);
+//                 ROS_INFO_STREAM(pushButtonPose.header);
+//                 ROS_INFO_STREAM(pushButtonPose.pose);
 
-                srv.request.kinematics_pose.pose.position = forwardButtonPosition(srv.request.kinematics_pose.pose.position, 0.05);
-                // srv.request.kinematics_pose.pose.position.x += 0.01;
-                srv.request.kinematics_pose.pose.position.y -= 0.015;
-                srv.request.kinematics_pose.pose.position.z += 0.015;
+//                 srv.request.kinematics_pose.pose.position = forwardButtonPosition(srv.request.kinematics_pose.pose.position, 0.05);
+//                 // srv.request.kinematics_pose.pose.position.x += 0.01;
+//                 srv.request.kinematics_pose.pose.position.y -= 0.015;
+//                 srv.request.kinematics_pose.pose.position.z += 0.015;
 
-                double moveDistance = sqrt(pow((srv.request.kinematics_pose.pose.position.x - currentToolPose.position.x), 2)
-                                        +  pow((srv.request.kinematics_pose.pose.position.y - currentToolPose.position.y), 2)
-                                        +  pow((srv.request.kinematics_pose.pose.position.z - currentToolPose.position.z), 2));
+//                 double moveDistance = sqrt(pow((srv.request.kinematics_pose.pose.position.x - currentToolPose.position.x), 2)
+//                                         +  pow((srv.request.kinematics_pose.pose.position.y - currentToolPose.position.y), 2)
+//                                         +  pow((srv.request.kinematics_pose.pose.position.z - currentToolPose.position.z), 2));
 
-                srv.request.path_time = moveDistance * 10.0;
-                double operating_time = srv.request.path_time;
-                double operating_limit_time = operating_time;
+//                 srv.request.path_time = moveDistance * 10.0;
+//                 double operating_time = srv.request.path_time;
+//                 double operating_limit_time = operating_time;
 
-                if (operating_time < 1.0)
-                {
-                    operating_limit_time = 1.0;
-                }
-                else if (operating_time > 3.0)
-                {
-                    operating_limit_time = 3.0;
-                }
+//                 if (operating_time < 1.0)
+//                 {
+//                     operating_limit_time = 1.0;
+//                 }
+//                 else if (operating_time > 3.0)
+//                 {
+//                     operating_limit_time = 3.0;
+//                 }
 
-                ROS_WARN("go xyz %.2f,%.2f,%.2f , moveDistance %.2f, operate time %.2f ( %.2f )", \
-                        srv.request.kinematics_pose.pose.position.x, srv.request.kinematics_pose.pose.position.y, srv.request.kinematics_pose.pose.position.z, \
-                        moveDistance, operating_time, operating_limit_time);
+//                 ROS_WARN("go xyz %.2f,%.2f,%.2f , moveDistance %.2f, operate time %.2f ( %.2f )", \
+//                         srv.request.kinematics_pose.pose.position.x, srv.request.kinematics_pose.pose.position.y, srv.request.kinematics_pose.pose.position.z, \
+//                         moveDistance, operating_time, operating_limit_time);
 
-                try
-                {
-                    resp = set_kinematics_position.call(srv);
-                    button = LIFT_UP;
-                }
-                catch(const ros::Exception& e)
-                {
-                    std::cout << "Service call failed: " << &e << std::endl;
-                    return false;
-                }
+//                 try
+//                 {
+//                     resp = set_kinematics_position.call(srv);
+//                     button = LIFT_UP;
+//                 }
+//                 catch(const ros::Exception& e)
+//                 {
+//                     std::cout << "Service call failed: " << &e << std::endl;
+//                     return false;
+//                 }
                 
-            }
-        }
-    }
-    else
-    {
-        ROS_INFO("Cannot go to the position of the button");
-        return resp;
-    }
-}
+//             }
+//         }
+//     }
+//     else
+//     {
+//         ROS_INFO("Cannot go to the position of the button");
+//         return resp;
+//     }
+// }
 
 bool PushButton::moveToButton(std::string target)
 {
     bool resp = false;
 
-    if (pushButtonPose.pose.position.x > 0)
+    if (pushButtonPose.pose.position.x > 0 && pushButtonPose.pose.position.x <= 0.3)
     {   
         ROS_WARN("move to button");
 
@@ -624,6 +626,7 @@ bool PushButton::moveToButton(std::string target)
                 try
                 {
                     resp = set_kinematics_position.call(srv);
+                    move_elevator = true;
                     return resp;
                 }
                 catch(const ros::Exception& e)
@@ -633,7 +636,8 @@ bool PushButton::moveToButton(std::string target)
                 }
             }
             else
-            {
+            {   
+                move_elevator = false;
                 continue;
             }
             

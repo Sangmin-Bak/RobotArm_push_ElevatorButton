@@ -85,6 +85,7 @@ private:
     bool push_start;
     bool is_triggered;
     bool is_shutdown;
+    bool move_elevator;
     std::vector<double> jointState;
     std::vector<double> kinematicsStates;
     std::string open_manipulator_moveing_state;
